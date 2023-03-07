@@ -1,0 +1,20 @@
+name: hw1
+channels:
+  - conda-forge
+  - pytorch
+  - nvidia
+  - defaults
+dependencies:
+  - python=3.10
+  - pylint
+  - yapf
+  - click
+  - requests
+  - beautifulsoup4
+  - tqdm
+  - lxml
+  - pillow
+  - pytorch
+  - torchvision
+  - pytorch-cuda=11.7
+prefix: /home/david/miniconda3/envs/hw1
