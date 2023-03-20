@@ -9,8 +9,6 @@ from torchvision.models import resnet18
 import torchvision.transforms as T
 from tqdm import tqdm
 
-from utilis import prune_model
-
 
 def predict(model: torch.nn.Module, testloader: torch.utils.data.DataLoader):
     acc_metric = Accuracy(task='multiclass',
@@ -39,13 +37,12 @@ if __name__ == '__main__':
     NUM_CLASSES = 10
 
     arg_parser = argparse.ArgumentParser()
-    arg_parser.add_argument('--weight_path','-w', type=str, required=True)
+    arg_parser.add_argument('--weight_path', '-w', type=str, required=True)
     args = arg_parser.parse_args()
     weight_path = args.weight_path
 
     model = resnet18(num_classes=NUM_CLASSES)
     model = model.to(DEVICE)
-    prune_model(model)
 
     model.load_state_dict(torch.load(weight_path, map_location=DEVICE))
 
