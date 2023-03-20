@@ -17,6 +17,7 @@ from tqdm import tqdm
 from utilis import mixup
 from utilis import prune_model
 from utilis import Recorder
+from utilis import remove_prune
 
 
 def get_dataloaders(batch_size=256):
@@ -217,3 +218,6 @@ if __name__ == '__main__':
               dirname=os.path.join(logdir, f'prune_{prune_times}'),
               alpha=0.95,
               temperature=2)
+
+    remove_prune(student_model)
+    torch.save(student_model.state_dict(), 'pruned_resnet18.pth')

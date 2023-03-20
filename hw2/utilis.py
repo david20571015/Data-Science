@@ -19,6 +19,15 @@ def prune_model(model: torch.nn.Module, prune_ratio=0.2):
                               amount=prune_ratio)
 
 
+def remove_prune(model: torch.nn.Module):
+    for _, module in model.named_modules():
+        if isinstance(module, torch.nn.Conv2d):
+            prune.remove(module, 'weight')
+        if isinstance(module, torch.nn.Linear):
+            prune.remove(module, 'weight')
+            prune.remove(module, 'bias')
+
+
 def mixup(data, target):
     lam = torch.rand(1, device=data.device)
     index = torch.randperm(data.size(0), device=data.device)
