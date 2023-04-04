@@ -1,0 +1,17 @@
+name: hw3
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - torchvision==0.14.1
+  - pytorch-cuda=11.7
+  - pytorch==1.13.1
+  - pylint
+  - pandas
+  - tqdm
+  - yapf
+  - torchmetrics
+prefix: /home/david/miniconda3/envs/hw3
