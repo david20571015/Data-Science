@@ -1,10 +1,8 @@
 import torch
 
-import random
 
-
-def _random_sample(datas, n_samples: int) -> list:
-    idx = torch.randperm(len(datas))[:n_samples]
+def _random_sample(datas: torch.Tensor, n_samples: int) -> torch.Tensor:
+    idx = torch.randperm(datas.size(0))[:n_samples]
     return datas[idx]
 
 
@@ -39,8 +37,7 @@ class CategoriesSampler:
             indices: shape: (n_way, n_shot + n_query).
         """
         for _ in range(self.n_batch):
-            classes = random.sample(range(self.n_classes), self.n_way)
-
+            classes = torch.randperm(self.n_classes)[:self.n_way]
             batches = []
 
             for c in classes:

@@ -17,7 +17,7 @@ def predict():
                               num_workers=4,
                               pin_memory=True)
 
-    model = ConvNet(emb_size=args.emb_dim).to(DEVICE)
+    model = ConvNet(chs=args.dims, emb_size=args.emb_dim).to(DEVICE)
     model.load_state_dict(torch.load(args.weights, map_location=DEVICE))
 
     result = []
@@ -47,12 +47,13 @@ def predict():
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--weights', type=str, default='model.pth')
+    parser.add_argument('--dims', type=int, nargs='+', default=[64, 64, 64])
     parser.add_argument('--emb-dim', type=int, default=128)
     args = parser.parse_args()
 
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    result = predict()
+    results = predict()
 
-    df = pd.DataFrame({'category': result})
+    df = pd.DataFrame({'category': results})
     df.to_csv('pred.csv', index_label='id')

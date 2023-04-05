@@ -1,7 +1,9 @@
 import argparse
 import copy
+from datetime import datetime
 
 import torch
+import torch.backends.cudnn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torchmetrics import Accuracy
@@ -30,7 +32,7 @@ def main():
     valid_dataset = TrainDataset('data/validation.pkl')
     valid_sampler = CategoriesSampler(valid_dataset.labels,
                                       n_classes=args.valid_n_class,
-                                      n_batch=100,
+                                      n_batch=400,
                                       n_way=args.valid_n_way,
                                       n_shot=args.n_shot,
                                       n_query=args.n_query)
@@ -39,7 +41,7 @@ def main():
                               num_workers=4,
                               pin_memory=True)
 
-    model = ConvNet(emb_size=args.emb_dim).to(DEVICE)
+    model = ConvNet(chs=args.dims, emb_size=args.emb_dim).to(DEVICE)
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
     scheduler = torch.optim.lr_scheduler.StepLR(optimizer,
                                                 step_size=50,
@@ -55,8 +57,8 @@ def main():
         train_acc = Accuracy(task='multiclass',
                              num_classes=args.train_n_way).to(DEVICE)
         model.train()
-        with tqdm(train_loader, desc=f'train', dynamic_ncols=True) as pbar:
-            for data, label in pbar:
+        with tqdm(train_loader, desc='train', dynamic_ncols=True) as pbar:
+            for data, _ in pbar:
                 # data.shape: (n_way, n_shot + n_query, channel, width, height)
                 data = data.to(DEVICE)
                 support, query = data[:, :args.n_shot], data[:, args.n_shot:]
@@ -100,7 +102,7 @@ def main():
                              num_classes=args.valid_n_way).to(DEVICE)
 
         model.eval()
-        with tqdm(valid_loader, desc=f'valid',
+        with tqdm(valid_loader, desc='valid',
                   dynamic_ncols=True) as pbar, torch.no_grad():
             for data, _ in pbar:
                 # data.shape: (n_way, n_shot + n_query, channel, width, height)
@@ -140,22 +142,25 @@ def main():
             best_state_dict = copy.deepcopy(model.state_dict())
 
     print(f'Best valid acc: {best_valid_acc:.4f}')
-    torch.save(best_state_dict, 'model.pth')
-
+    torch.save(best_state_dict,
+               f'model_{datetime.now().strftime("%Y%m%d_%H%M%S")}.pth')
 
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=500)
+    parser.add_argument('--epochs', type=int, default=200)
+    parser.add_argument('--dims', type=int, nargs='+', default=[32, 64, 64])
     parser.add_argument('--emb-dim', type=int, default=128)
     parser.add_argument('--train-n-class', type=int, default=64)
     parser.add_argument('--valid-n-class', type=int, default=16)
-    parser.add_argument('--train-n-way', type=int, default=20)
+    parser.add_argument('--train-n-way', type=int, default=32)
     parser.add_argument('--valid-n-way', type=int, default=5)
     parser.add_argument('--n-shot', type=int, default=5)
     parser.add_argument('--n-query', type=int, default=5)
     args = parser.parse_args()
 
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+    torch.backends.cudnn.benchmark = True
 
     main()
