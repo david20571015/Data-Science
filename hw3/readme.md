@@ -50,7 +50,7 @@ options:
 - `--train-data TRAIN_DATA`: path to train pkl data. default: data/train.pkl
 - `--valid-data VALID_DATA`: path to validation pkl data. default: data/validation.pkl
 - `--dims DIMS [DIMS ...]`: channels of hidden conv layers. default: [64, 64, 64]
-- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 128
+- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 64
 - `--epochs EPOCHS`: default: 300
 - `--train-n-class TRAIN_N_CLASS`: number of total classes in the training dataset. default: 64
 - `--valid-n-class VALID_N_CLASS`: number of total classes in the valid dataset. default: 16
@@ -78,7 +78,7 @@ options:
 - `-h, --help`: show this help message and exit
 - `--test-data TEST_DATA`: path to test pkl data. default: data/test.pkl
 - `--dims DIMS [DIMS ...]`: channels of hidden conv layers. default: [64, 64, 64]
-- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 128
+- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 64
 - `--weights WEIGHTS`: path to model weights. default: model.pth
 
 ### Predict Result

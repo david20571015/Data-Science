@@ -59,9 +59,9 @@ if __name__ == '__main__':
                         type=int,
                         help='channels of hidden conv layers. default: [64, 64, 64]')
     parser.add_argument('--emb-dim',
-                        default=128,
+                        default=64,
                         type=int,
-                        help='embedding dimension (output dim of the model). default: 128')
+                        help='embedding dimension (output dim of the model). default: 64')
     parser.add_argument('--weights',
                         default='model.pth',
                         type=str,
