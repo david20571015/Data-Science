@@ -1,6 +1,7 @@
 import argparse
 import copy
 from datetime import datetime
+import os
 
 import torch
 import torch.backends.cudnn
@@ -17,7 +18,7 @@ from src.utils import euclidean_distance_sqaured
 
 
 def main():
-    train_dataset = TrainDataset('data/train.pkl')
+    train_dataset = TrainDataset(args.train_data)
     train_sampler = CategoriesSampler(train_dataset.labels,
                                       n_classes=args.train_n_class,
                                       n_batch=400,
@@ -29,7 +30,7 @@ def main():
                               num_workers=4,
                               pin_memory=True)
 
-    valid_dataset = TrainDataset('data/validation.pkl')
+    valid_dataset = TrainDataset(args.valid_data)
     valid_sampler = CategoriesSampler(valid_dataset.labels,
                                       n_classes=args.valid_n_class,
                                       n_batch=400,
@@ -148,15 +149,51 @@ def main():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--epochs', type=int, default=200)
-    parser.add_argument('--dims', type=int, nargs='+', default=[32, 64, 64])
-    parser.add_argument('--emb-dim', type=int, default=128)
-    parser.add_argument('--train-n-class', type=int, default=64)
-    parser.add_argument('--valid-n-class', type=int, default=16)
-    parser.add_argument('--train-n-way', type=int, default=32)
-    parser.add_argument('--valid-n-way', type=int, default=5)
-    parser.add_argument('--n-shot', type=int, default=5)
-    parser.add_argument('--n-query', type=int, default=5)
+    # Data
+    parser.add_argument('--train-data',
+                        default=os.path.join('data', 'train.pkl'),
+                        type=str,
+                        help='path to train pkl data')
+    parser.add_argument('--valid-data',
+                        default=os.path.join('data', 'validation.pkl'),
+                        type=str,
+                        help='path to validation pkl data')
+    # Model
+    parser.add_argument('--dims',
+                        nargs='+',
+                        default=[64, 64, 64],
+                        type=int,
+                        help='channels of hidden conv layers')
+    parser.add_argument('--emb-dim',
+                        default=128,
+                        type=int,
+                        help='embedding dimension (output dim of the model)')
+    # Training
+    parser.add_argument('--epochs', type=int, default=300)
+    parser.add_argument('--train-n-class',
+                        default=64,
+                        type=int,
+                        help='number of total classes in the training dataset')
+    parser.add_argument('--valid-n-class',
+                        default=16,
+                        type=int,
+                        help='number of total classes in the valid dataset')
+    parser.add_argument('--train-n-way',
+                        default=20,
+                        type=int,
+                        help='number of classes in a training episode')
+    parser.add_argument('--valid-n-way',
+                        default=5,
+                        type=int,
+                        help='number of classes in a valid episode')
+    parser.add_argument('--n-shot',
+                        default=5,
+                        type=int,
+                        help='number of support examples per class')
+    parser.add_argument('--n-query',
+                        default=5,
+                        type=int,
+                        help='number of query examples per class')
     args = parser.parse_args()
 
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')

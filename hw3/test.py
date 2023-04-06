@@ -1,4 +1,5 @@
 import argparse
+import os
 
 import pandas as pd
 import torch
@@ -11,7 +12,7 @@ from src.utils import euclidean_distance_sqaured
 
 
 def predict():
-    infer_dataset = InferDataset('data/test.pkl')
+    infer_dataset = InferDataset(args.test_data)
     infer_loader = DataLoader(infer_dataset,
                               batch_size=1,
                               num_workers=4,
@@ -46,9 +47,25 @@ def predict():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--weights', type=str, default='model.pth')
-    parser.add_argument('--dims', type=int, nargs='+', default=[64, 64, 64])
-    parser.add_argument('--emb-dim', type=int, default=128)
+    # Data
+    parser.add_argument('--test-data',
+                        default=os.path.join('data', 'test.pkl'),
+                        type=str,
+                        help='path to test pkl data')
+    # Model
+    parser.add_argument('--dims',
+                        nargs='+',
+                        default=[64, 64, 64],
+                        type=int,
+                        help='channels of hidden conv layers')
+    parser.add_argument('--emb-dim',
+                        default=128,
+                        type=int,
+                        help='embedding dimension (output dim of the model)')
+    parser.add_argument('--weights',
+                        default='model.pth',
+                        type=str,
+                        help='path to model weights')
     args = parser.parse_args()
 
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
