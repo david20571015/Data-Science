@@ -1,3 +1,5 @@
+from typing import Optional
+
 import torch
 from torch import nn
 import torch.nn.functional as F
@@ -17,10 +19,12 @@ class ConvNet(nn.Module):
     def __init__(
         self,
         in_ch=3,
-        chs: list[int] = [64, 128, 128],
+        chs: Optional[list[int]] = None,
         emb_size=64,
     ):
         super().__init__()
+
+        chs = chs or [64, 128, 128]
 
         dims = [in_ch] + chs
         conv_blocks = [
