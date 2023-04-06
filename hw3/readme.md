@@ -21,6 +21,13 @@ conda activate hw3
 
 ## Usage
 
+### Data Location
+
+- `data/`: The data folder.
+  - `train.pkl`: The training data.
+  - `validation.pkl`: The validation data.
+  - `test.cpklsv`: The testing data.
+
 ### Train
 
 ```bash
