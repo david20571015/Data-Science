@@ -51,21 +51,21 @@ if __name__ == '__main__':
     parser.add_argument('--test-data',
                         default=os.path.join('data', 'test.pkl'),
                         type=str,
-                        help='path to test pkl data')
+                        help='path to test pkl data. default: data/test.pkl')
     # Model
     parser.add_argument('--dims',
                         nargs='+',
                         default=[64, 64, 64],
                         type=int,
-                        help='channels of hidden conv layers')
+                        help='channels of hidden conv layers. default: [64, 64, 64]')
     parser.add_argument('--emb-dim',
                         default=128,
                         type=int,
-                        help='embedding dimension (output dim of the model)')
+                        help='embedding dimension (output dim of the model). default: 128')
     parser.add_argument('--weights',
                         default='model.pth',
                         type=str,
-                        help='path to model weights')
+                        help='path to model weights. default: model.pth')
     args = parser.parse_args()
 
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
