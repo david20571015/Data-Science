@@ -154,42 +154,50 @@ if __name__ == '__main__':
                         default=os.path.join('data', 'train.pkl'),
                         type=str,
                         help='path to train pkl data. default: data/train.pkl')
-    parser.add_argument('--valid-data',
-                        default=os.path.join('data', 'validation.pkl'),
-                        type=str,
-                        help='path to validation pkl data. default: data/validation.pkl')
+    parser.add_argument(
+        '--valid-data',
+        default=os.path.join('data', 'validation.pkl'),
+        type=str,
+        help='path to validation pkl data. default: data/validation.pkl')
     # Model
-    parser.add_argument('--dims',
-                        nargs='+',
-                        default=[64, 64, 64],
-                        type=int,
-                        help='channels of hidden conv layers. default: [64, 64, 64]')
-    parser.add_argument('--emb-dim',
-                        default=64,
-                        type=int,
-                        help='embedding dimension (output dim of the model). default: 64')
+    parser.add_argument(
+        '--dims',
+        nargs='+',
+        default=[64, 64, 64],
+        type=int,
+        help='channels of hidden conv layers. default: [64, 64, 64]')
+    parser.add_argument(
+        '--emb-dim',
+        default=64,
+        type=int,
+        help='embedding dimension (output dim of the model). default: 64')
     # Training
     parser.add_argument('--epochs', type=int, default=300)
-    parser.add_argument('--train-n-class',
-                        default=64,
-                        type=int,
-                        help='number of total classes in the training dataset. default: 64')
-    parser.add_argument('--valid-n-class',
-                        default=16,
-                        type=int,
-                        help='number of total classes in the valid dataset. default: 16')
-    parser.add_argument('--train-n-way',
-                        default=20,
-                        type=int,
-                        help='number of classes in a training episode. default: 20')
-    parser.add_argument('--valid-n-way',
-                        default=5,
-                        type=int,
-                        help='number of classes in a valid episode. default: 5')
-    parser.add_argument('--n-shot',
-                        default=5,
-                        type=int,
-                        help='number of support examples per class. default: 5')
+    parser.add_argument(
+        '--train-n-class',
+        default=64,
+        type=int,
+        help='number of total classes in the training dataset. default: 64')
+    parser.add_argument(
+        '--valid-n-class',
+        default=16,
+        type=int,
+        help='number of total classes in the valid dataset. default: 16')
+    parser.add_argument(
+        '--train-n-way',
+        default=20,
+        type=int,
+        help='number of classes in a training episode. default: 20')
+    parser.add_argument(
+        '--valid-n-way',
+        default=5,
+        type=int,
+        help='number of classes in a valid episode. default: 5')
+    parser.add_argument(
+        '--n-shot',
+        default=5,
+        type=int,
+        help='number of support examples per class. default: 5')
     parser.add_argument('--n-query',
                         default=5,
                         type=int,
