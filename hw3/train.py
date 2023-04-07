@@ -81,7 +81,7 @@ def main():
                     args.train_n_way,
                     dtype=torch.long,
                     device=DEVICE,
-                ).repeat(args.n_query, 1).t().reshape(-1)
+                ).repeat_interleave(args.n_query, dim=0)
 
                 loss = F.cross_entropy(logits, labels)
 
@@ -127,7 +127,7 @@ def main():
                     args.valid_n_way,
                     dtype=torch.long,
                     device=DEVICE,
-                ).repeat(args.n_query, 1).t().reshape(-1)
+                ).repeat_interleave(args.n_query, dim=0)
 
                 loss = F.cross_entropy(logits, labels)
 
