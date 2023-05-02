@@ -6,6 +6,7 @@ import shutil
 import cv2
 import numpy as np
 from PIL import Image
+from tqdm import tqdm
 
 
 def cal_new_size(im_h, im_w, min_size, max_size):
@@ -86,7 +87,7 @@ if __name__ == '__main__':
     if not os.path.exists(sub_save_dir):
         os.makedirs(sub_save_dir)
     im_list = glob(os.path.join(sub_dir, '*jpg'))
-    from tqdm import tqdm
+
     for im_path in tqdm(im_list):
         name = os.path.basename(im_path)
         #print(name)

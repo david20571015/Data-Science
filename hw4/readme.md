@@ -9,7 +9,7 @@ conda create --name hw3 python=3.10 -y
 conda activate hw4
 
 conda install pytorch==1.13.1 torchvision==0.14.1 pytorch-cuda=11.7 -c pytorch -c nvidia -y
-conda install numpy tqdm pandas torchmetrics -c conda-forge -y
+conda install torchmetrics tqdm numpy pandas pillow pylint yapf -c conda-forge -y
 ```
 
 or
@@ -35,40 +35,24 @@ conda activate hw4
 
 ```bash
 # resize labels to fit the image size
-# take about 10 minutes on 1 GeForce GTX 1080
 python data_process.py --origin-dir data_process --data-dir data_processed
-
-# create density map and save to data/train
-# take about 10 minutes on 1 GeForce GTX 1080
-# you can remove the `--dynamic` option to use static sigma which leads to poor performance but faster speed
-python create_dm.py --input-dir data_processed/train --output-dir data/train --dynamic
-
-# create density map and save to data/train
-# take about 50 minutes on 1 GeForce GTX 1080
-python create_dm.py --input-dir data_processed/train --output-dir data/train
-
-cp data_processed/train/* data/train
 ```
 
 After running the above commands, the data folder should look like this:
 
 - `data/`: The data folder.
-  - `train/`: The training data.
-    - `*.jpg`: The training images.
-    - `*_dm.jpg`: The training density maps.
-    - `*.npy`: The training labels.
   - `test/`: The testing data.
     - `*.jpg`: The testing images.
 - `data_process/`: The data folder for data preprocess.
   - `train/`: The training data.
     - `*.jpg`: The training images.
     - `*.txt`: The training labels.
-- `data_processed/`: The data folder for data preprocess.
+- `data_processed/`: The data folder for preprocessed data.
   - `train/`: The training data.
     - `*.jpg`: The training images.
     - `*.npy`: The training labels.
 
-Both `data_process` and `data_processed` are able to be deleted after running the above commands.
+`data_process` is able to be deleted after running the above commands.
 
 ### Train
 
@@ -81,25 +65,19 @@ python train.py
 or
 
 ```bash
-python train.py [-h] [--train-data TRAIN_DATA] [--valid-data VALID_DATA] [--dims DIMS [DIMS ...]] [--emb-dim EMB_DIM]
-                [--epochs EPOCHS] [--train-n-class TRAIN_N_CLASS] [--valid-n-class VALID_N_CLASS] [--train-n-way TRAIN_N_WAY]
-                [--valid-n-way VALID_N_WAY] [--n-shot N_SHOT] [--n-query N_QUERY]
+usage: train.py [-h] [--data-dir DATA_DIR] [--epoch EPOCH] [--lr LR] [--weight-decay WEIGHT_DECAY] [--sigma SIGMA]
 ```
 
 options:
 
-- `-h, --help`: show this help message and exit
-- `--train-data TRAIN_DATA`: path to train pkl data. default: data/train.pkl
-- `--valid-data VALID_DATA`: path to validation pkl data. default: data/validation.pkl
-- `--dims DIMS [DIMS ...]`: channels of hidden conv layers. default: [64, 64, 64]
-- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 64
-- `--epochs EPOCHS`: default: 300
-- `--train-n-class TRAIN_N_CLASS`: number of total classes in the training dataset. default: 64
-- `--valid-n-class VALID_N_CLASS`: number of total classes in the valid dataset. default: 16
-- `--train-n-way TRAIN_N_WAY`: number of classes in a training episode. default: 20
-- `--valid-n-way VALID_N_WAY`: number of classes in a valid episode. default: 5
-- `--n-shot N_SHOT`: number of support examples per class. default: 5
-- `--n-query N_QUERY`: number of query examples per class. default: 5
+- `-h, --help`            show this help message and exit
+- `--data-dir DATA_DIR`   path to training data image directory which contains images(\*.jpg) and points(\*.npy)
+                          (default: data_processed/train)
+- `--epoch EPOCH`         epoch (default: 500)
+- `--lr LR`               learning rate (default: 1e-05)
+- `--weight-decay WEIGHT_DECAY`
+                          weight decay (default: 0.0001)
+- `--sigma SIGMA`         sigma for gaussian kernel (default: 8.0)
 
 ### Predict
 
@@ -112,21 +90,19 @@ python test.py
 or
 
 ```bash
-python test.py [-h] [--test-data TEST_DATA] [--dims DIMS [DIMS ...]] [--emb-dim EMB_DIM] [--weights WEIGHTS]
+predict.py [-h] [--data DATA] [--weights WEIGHTS]
 ```
 
 options:
 
-- `-h, --help`: show this help message and exit
-- `--test-data TEST_DATA`: path to test pkl data. default: data/test.pkl
-- `--dims DIMS [DIMS ...]`: channels of hidden conv layers. default: [64, 64, 64]
-- `--emb-dim EMB_DIM`: embedding dimension (output dim of the model). default: 64
-- `--weights WEIGHTS`: path to model weights. default: model.pth
+- `-h, --help`         show this help message and exit
+- `--data DATA`        path to dataset which contains images(\*.jpg) (default: data/test)
+- `--weights WEIGHTS`  path to weights (default: best_model.pth)
 
 ### Predict Result
 
-- `pred.csv`: A csv file with two columns: `id` and `category`.
+- `pred.csv`: A csv file with two columns: `ID` and `COUNT`.
 
 ## Method
 
-[Prototypical Networks for Few-shot Learning](https://arxiv.org/pdf/1703.05175.pdf)
+[Bayesian Loss for Crowd Count Estimation with Point Supervision](https://arxiv.org/pdf/1908.03684.pdf)
