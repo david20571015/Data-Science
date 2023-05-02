@@ -9,6 +9,7 @@ from tqdm import tqdm
 BACKBONE = efficientnet_b2
 WEIGHTS = EfficientNet_B2_Weights.DEFAULT
 
+
 @click.command()
 @click.argument('image-path-file', type=click.File('r'))
 def predict(image_path_file):
@@ -23,7 +24,8 @@ def predict(image_path_file):
         torch.nn.AdaptiveAvgPool1d(1),
     )
     model.load_state_dict(
-        torch.load('model_efficientnet_b2.pth'))
+        torch.load('model_efficientnet_b2.pth',
+                   map_location=torch.device('cpu')))
 
     results = []
 
