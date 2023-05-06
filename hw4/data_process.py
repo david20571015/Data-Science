@@ -1,11 +1,11 @@
 import argparse
 from glob import glob
 import os
-import shutil
 
 import cv2
 import numpy as np
 from PIL import Image
+import scipy.spatial
 from tqdm import tqdm
 
 
@@ -35,6 +35,18 @@ def cal_new_size(im_h, im_w, min_size, max_size):
     return im_h, im_w, ratio
 
 
+def find_dis(point):
+    dist = scipy.spatial.distance.cdist(point, point)
+    self_idx = list(range(len(point)))
+    dist[self_idx, self_idx] = np.inf
+
+    ktop = min(3, len(point) - 1)
+    dist = np.mean(np.partition(dist, ktop, axis=1)[:, :ktop + 1],
+                   axis=1,
+                   keepdims=True)
+    return dist
+
+
 def generate_data(im_path):
     im = Image.open(im_path)
     im_w, im_h = im.size
@@ -51,13 +63,14 @@ def generate_data(im_path):
     points = np.array(points)
 
     if len(points > 0):
-        idx_mask = (points[:, 0] >= 0) * (points[:, 0] <= im_w) * (
-            points[:, 1] >= 0) * (points[:, 1] <= im_h)
+        idx_mask = (points[:, 0] >= 0) * (points[:, 0] < im_w) * (
+            points[:, 1] >= 0) * (points[:, 1] < im_h)
         points = points[idx_mask]
+
     im_h, im_w, rr = cal_new_size(im_h, im_w, min_size, max_size)
     im = np.array(im)
-    if rr != 1.0:
 
+    if rr != 1.0:
         im = cv2.resize(np.array(im), (im_w, im_h), cv2.INTER_CUBIC)
         points = points * rr
 
@@ -90,8 +103,16 @@ if __name__ == '__main__':
 
     for im_path in tqdm(im_list):
         name = os.path.basename(im_path)
-        #print(name)
         im, points = generate_data(im_path)
+
+        if len(points) == 0:
+            points = np.zeros((1, 3), dtype=np.float32)
+        elif len(points) == 1:
+            dis = np.full((1, 1), 128.0, dtype=np.float32)
+            points = np.concatenate([points, dis], axis=1)
+        else:
+            dis = find_dis(points)
+            points = np.concatenate([points, dis], axis=1)
 
         im_save_path = os.path.join(sub_save_dir, name)
         im.save(im_save_path, quality=95)

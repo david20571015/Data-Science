@@ -20,7 +20,7 @@ def main():
     test_dataloader = torch.utils.data.DataLoader(test_dataset,
                                                   batch_size=1,
                                                   shuffle=False,
-                                                  num_workers=2,
+                                                  num_workers=4,
                                                   pin_memory=True)
 
     model = VGG().to(DEVICE)
@@ -33,8 +33,11 @@ def main():
         for file_id, image in pbar:
             image, file_id = image.to(DEVICE), file_id.to(DEVICE)
 
-            pred = model(image)
-            result[file_id - 1] = pred.sum()
+            try:
+                pred = model(image)
+                result[file_id - 1] = pred.sum()
+            except:
+                pass
 
     df = pd.DataFrame({'Count': result.tolist()})
     df.index += 1
@@ -43,7 +46,7 @@ def main():
 
 if __name__ == '__main__':
     DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    torch.backends.cudnn.benchmark = True
+    # torch.backends.cudnn.benchmark = True
 
     parser = argparse.ArgumentParser(
         formatter_class=argparse.ArgumentDefaultsHelpFormatter)

@@ -5,11 +5,11 @@
 ### Create environment
 
 ```bash
-conda create --name hw3 python=3.10 -y
+conda create --name hw4 python=3.10 -y
 conda activate hw4
 
 conda install pytorch==1.13.1 torchvision==0.14.1 pytorch-cuda=11.7 -c pytorch -c nvidia -y
-conda install torchmetrics tqdm numpy pandas pillow pylint yapf -c conda-forge -y
+conda install torchmetrics tqdm numpy pandas pillow scipy -c conda-forge -y
 ```
 
 or
@@ -34,7 +34,7 @@ conda activate hw4
 ### Data Preprocess
 
 ```bash
-# resize labels to fit the image size
+# Resize labels to fit the image size and compute the size of bbox.
 python data_process.py --origin-dir data_process --data-dir data_processed
 ```
 
@@ -73,7 +73,7 @@ options:
 - `-h, --help`            show this help message and exit
 - `--data-dir DATA_DIR`   path to training data image directory which contains images(\*.jpg) and points(\*.npy)
                           (default: data_processed/train)
-- `--epoch EPOCH`         epoch (default: 500)
+- `--epoch EPOCH`         epoch (default: 1000)
 - `--lr LR`               learning rate (default: 1e-05)
 - `--weight-decay WEIGHT_DECAY`
                           weight decay (default: 0.0001)
@@ -84,7 +84,7 @@ options:
 predict with default parameters
 
 ```bash
-python test.py
+python predict.py
 ```
 
 or
@@ -97,7 +97,7 @@ options:
 
 - `-h, --help`         show this help message and exit
 - `--data DATA`        path to dataset which contains images(\*.jpg) (default: data/test)
-- `--weights WEIGHTS`  path to weights (default: best_model.pth)
+- `--weights WEIGHTS`  path to weights (default: model.pth)
 
 ### Predict Result
 

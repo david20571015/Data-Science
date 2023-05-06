@@ -15,35 +15,38 @@ from src.losses import compute_loss
 from src.models import VGG
 
 
-def main():
-    transforms = T.Compose([
-        T.RandomCrop((512, 512)),
-        T.RandomHorizontalFlip(),
-    ])
+def collate_fn(batch):
+    images, keypoints, targets, short_sizes = list(zip(*batch))
+    images = torch.stack(images, dim=0)
+    short_sizes = torch.tensor(short_sizes, dtype=torch.float)
+    return images, keypoints, targets, short_sizes
 
+
+def main():
     transform = T.Compose([
         T.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
 
     train_dataset, valid_dataset = random_split(
-        TrainDataset(args.data_dir, transforms=transforms,
-                     transform=transform), [0.8, 0.2])
+        TrainDataset(args.data_dir, transform=transform), [0.8, 0.2])
     train_dataloader = torch.utils.data.DataLoader(train_dataset,
                                                    batch_size=8,
                                                    shuffle=True,
-                                                   num_workers=3,
+                                                   num_workers=4,
+                                                   collate_fn=collate_fn,
                                                    pin_memory=True)
     valid_dataloader = torch.utils.data.DataLoader(valid_dataset,
                                                    batch_size=16,
                                                    shuffle=False,
-                                                   num_workers=3,
+                                                   num_workers=4,
+                                                   collate_fn=collate_fn,
                                                    pin_memory=True)
 
     model = VGG().to(DEVICE)
-    # model.load_state_dict(torch.load('best_model.pth'))
     optimizer = torch.optim.Adam(model.parameters(),
                                  lr=args.lr,
                                  weight_decay=args.weight_decay)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, 200, 0.5)
 
     best_valid_mae = float('inf')
 
@@ -55,44 +58,50 @@ def main():
 
         model.train()
         with tqdm(train_dataloader, dynamic_ncols=True) as pbar:
-            for images, gts in pbar:
-                images, gts = images.to(DEVICE), gts.to(DEVICE)
+            for images, keypoints, targets, short_sizes in pbar:
+                images, short_sizes = images.to(DEVICE), short_sizes.to(DEVICE)
+                keypoints = [k.to(DEVICE) for k in keypoints]
+                targets = [t.to(DEVICE) for t in targets]
 
                 preds = model(images)
 
-                total_loss = torch.tensor(0.0, device=DEVICE)
-                for pred, gt in zip(preds, gts):
-                    loss = compute_loss(pred, gt, sigma=args.sigma)
-                    total_loss += loss
-                loss = total_loss / len(preds)
+                loss = compute_loss(preds, keypoints, targets, short_sizes,
+                                    args.sigma)
 
                 optimizer.zero_grad()
                 loss.backward()
                 optimizer.step()
 
-                with torch.no_grad():
-                    train_loss.update(loss)
+                train_loss.update(loss)
 
-                    pred_count = preds.view(preds.size(0), -1).sum(-1)
-                    gt_count = gts.view(gts.size(0), -1).sum(-1)
+                pred_count = preds.view(preds.size(0), -1).sum(-1)
+                gt_count = torch.tensor([len(p) for p in keypoints],
+                                        dtype=torch.float,
+                                        device=DEVICE)
 
-                    train_mae.update(pred_count, gt_count)
+                train_mae.update(pred_count, gt_count)
 
                 pbar.set_postfix_str(f'loss: {train_loss.compute():.5f}, '
                                      f'mae: {train_mae.compute():.5f}')
+
+        scheduler.step()
 
         valid_mae = MeanAbsoluteError().to(DEVICE)
 
         model.eval()
         with torch.inference_mode(True), tqdm(valid_dataloader,
                                               dynamic_ncols=True) as pbar:
-            for images, gts in pbar:
-                images, gts = images.to(DEVICE), gts.to(DEVICE)
+            for images, keypoints, targets, short_sizes in pbar:
+                images, short_sizes = images.to(DEVICE), short_sizes.to(DEVICE)
+                keypoints = [k.to(DEVICE) for k in keypoints]
+                targets = [t.to(DEVICE) for t in targets]
 
                 preds = model(images)
 
                 pred_count = preds.view(preds.size(0), -1).sum(-1)
-                gt_count = gts.view(gts.size(0), -1).sum(-1)
+                gt_count = torch.tensor([len(p) for p in keypoints],
+                                        dtype=torch.float,
+                                        device=DEVICE)
 
                 valid_mae.update(pred_count, gt_count)
 
@@ -122,7 +131,7 @@ if __name__ == '__main__':
     )
 
     # training
-    parser.add_argument('--epoch', default=500, type=int, help='epoch')
+    parser.add_argument('--epoch', default=1000, type=int, help='epoch')
     parser.add_argument('--lr', default=1e-5, type=float, help='learning rate')
     parser.add_argument('--weight-decay',
                         default=1e-4,
