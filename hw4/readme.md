@@ -97,7 +97,7 @@ options:
 
 - `-h, --help`         show this help message and exit
 - `--data DATA`        path to dataset which contains images(\*.jpg) (default: data/test)
-- `--weights WEIGHTS`  path to weights (default: model.pth)
+- `--weights WEIGHTS`  path to weights (default: best_model.pth)
 
 ### Predict Result
 
