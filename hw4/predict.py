@@ -33,11 +33,8 @@ def main():
         for file_id, image in pbar:
             image, file_id = image.to(DEVICE), file_id.to(DEVICE)
 
-            try:
-                pred = model(image)
-                result[file_id - 1] = pred.sum()
-            except:
-                pass
+            pred = model(image)
+            result[file_id - 1] = pred.sum()
 
     df = pd.DataFrame({'Count': result.tolist()})
     df.index += 1
