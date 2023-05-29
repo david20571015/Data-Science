@@ -1,24 +1,13 @@
 import json
-import os
 from typing import cast
 
-from datasets import Dataset
 from datasets import DatasetDict
 from datasets import load_dataset
-from datasets import load_from_disk
-import evaluate
-import numpy as np
-import torch
 from tqdm import tqdm
 from transformers import AutoModelForSeq2SeqLM
 from transformers import AutoTokenizer
-from transformers import DataCollatorForSeq2Seq
 from transformers import pipeline
-from transformers import Seq2SeqTrainer
-from transformers import Seq2SeqTrainingArguments
 from transformers.pipelines.pt_utils import KeyDataset
-
-from src.utils import prepare_train_dataset
 
 MODEL_NAME = './model'
 
@@ -54,11 +43,12 @@ summarizer = pipeline('summarization',
                       tokenizer=tokenizer,
                       device='cuda:0')
 
-with open('submission.json', 'a', encoding='utf-8') as f:
+with open('311511038.json', 'a', encoding='utf-8') as f:
     for output in tqdm(summarizer(KeyDataset(dataset, 'inputs'),
                                   batch_size=32,
                                   truncation=True),
                        total=len(dataset)):
         result = output[0]['summary_text']
-
         print(json.dumps({'title': result}), file=f)
+
+    print(file=f) # add a newline at the end

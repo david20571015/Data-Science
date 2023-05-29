@@ -37,27 +37,13 @@ def prepare_train_dataset(
         prefix = 'summarize: '
         inputs = [prefix + body for body in data['body']]
 
-        model_inputs = tokenizer(
-            inputs,
-            # padding='max_length',
-            truncation=True,
-        )
+        model_inputs = tokenizer(inputs, truncation=True)
 
-        labels = tokenizer(
-            data['title'],
-            #    padding='max_length',
-            truncation=True)
+        labels = tokenizer(data['title'], truncation=True)
 
         model_inputs['labels'] = labels['input_ids']
 
         return model_inputs
-
-        # return {
-        #     'title_input_ids': labels['input_ids'],
-        #     'title_attention_mask': labels['attention_mask'],
-        #     'body_input_ids': model_inputs['input_ids'],
-        #     'body_attention_mask': model_inputs['attention_mask']
-        # }
 
     dataset = cast(DatasetDict,
                    load_dataset('json', data_files=data_files, num_proc=5))

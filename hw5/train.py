@@ -1,4 +1,3 @@
-import os
 from typing import cast
 
 import evaluate
@@ -52,10 +51,10 @@ def compute_metrics(eval_pred):
 
 
 training_args = Seq2SeqTrainingArguments(
-    output_dir="logs",
-    save_strategy="steps",
+    output_dir='logs',
+    save_strategy='steps',
     save_steps=1000,
-    evaluation_strategy="steps",
+    evaluation_strategy='steps',
     eval_steps=1000,
     learning_rate=1e-5,
     per_device_train_batch_size=4,
