@@ -22,7 +22,7 @@ def main():
         'node anomaly score': predictions.flatten().tolist()
     }).set_index('node idx')
 
-    df.to_csv('result.csv')
+    df.to_csv('submission.csv')
 
 
 if __name__ == '__main__':
