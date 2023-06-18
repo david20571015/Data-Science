@@ -34,10 +34,6 @@ class TrainDataset(BaseDataset):
 
         self._data = torch.load(self.processed_paths[0])
 
-        # if stage == 'train':
-        #     self._data = torch.load(self.processed_paths[0])
-        # elif stage == 'valid':
-        #     self._data = torch.load(self.processed_paths[1])
 
     @property
     def raw_file_names(self):
@@ -50,7 +46,6 @@ class TrainDataset(BaseDataset):
     def processed_file_names(self):
         return [
             'processed_train_data.pt',
-            # 'processed_valid_data.pt',
         ]
 
     def process(self):
@@ -86,19 +81,6 @@ class TrainDataset(BaseDataset):
 
         torch.save(data, self.processed_paths[0])
 
-        # train_data = data.subgraph(train_mask)
-        # torch.save(train_data, self.processed_paths[0])
-
-        # valid_data = data.subgraph(valid_mask)
-        # torch.save(valid_data, self.processed_paths[1])
-
-        # return Data(
-        #     x=data.feature,
-        #     edge_index=data.edge_index,
-        #     y=y.unsqueeze(-1),
-        #     train_mask=train_mask,
-        #     valid_mask=valid_mask,
-        # )
 
 
 class TestDataset(BaseDataset):
@@ -155,8 +137,6 @@ class GraphDataModule(pl.LightningDataModule):
         if stage == 'fit':
             self.train_dataset = TrainDataset(self.data_dir, self.train_ratio,
                                               'train')
-            # self.valid_dataset = TrainDataset(self.data_dir, self.train_ratio,
-            #                                 'valid')
         elif stage == 'predict':
             self.test_dataset = TestDataset(self.data_dir)
         else:
