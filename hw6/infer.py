@@ -29,8 +29,8 @@ if __name__ == '__main__':
     parser = ArgumentParser()
     parser.add_argument('--weights',
                         '-w',
+                        default='model.ckpt',
                         type=str,
-                        required=True,
                         help='Path to the model weights.')
     args = parser.parse_args()
 
