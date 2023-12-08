@@ -65,7 +65,7 @@ python train.py
 or
 
 ```bash
-usage: train.py [-h] [--data-dir DATA_DIR] [--epoch EPOCH] [--lr LR] [--weight-decay WEIGHT_DECAY] [--sigma SIGMA]
+python train.py [-h] [--data-dir DATA_DIR] [--epoch EPOCH] [--lr LR] [--weight-decay WEIGHT_DECAY] [--sigma SIGMA]
 ```
 
 options:
@@ -90,7 +90,7 @@ python predict.py
 or
 
 ```bash
-predict.py [-h] [--data DATA] [--weights WEIGHTS]
+python predict.py [-h] [--data DATA] [--weights WEIGHTS]
 ```
 
 options:
