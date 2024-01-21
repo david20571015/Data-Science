@@ -1,4 +1,4 @@
-# Data Science HW6
+# Graph Anomaly Detection
 
 ## Environment
 
