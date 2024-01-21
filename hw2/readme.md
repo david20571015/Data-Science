@@ -1,4 +1,4 @@
-# Data Science HW2
+# Knowlege Distillation
 
 ## Environment
 
